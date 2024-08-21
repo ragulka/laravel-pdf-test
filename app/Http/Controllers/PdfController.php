@@ -6,7 +6,6 @@ use App\Actions\CreatePdfAction;
 use App\Jobs\GeneratePdfJob;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use function Spatie\LaravelPdf\Support\pdf;
 
 class PdfController extends Controller
 {
@@ -27,7 +26,7 @@ class PdfController extends Controller
     {
         $url = 'https://laravel.com';
 
-        GeneratePdfJob::dispatch($this)->onQueue('pdf');
+        GeneratePdfJob::dispatch($url)->onQueue('pdf');
 
         // Define a maximum generation time in seconds
         $maxGenerationTime = 15; // 15 seconds
@@ -36,7 +35,7 @@ class PdfController extends Controller
         $startTime = microtime(true);
 
         // Poll for the job completion via cache
-        $cacheKey = 'temp_pdf_'.$url;
+        $cacheKey = 'temp_pdf_'.base64_encode($url);
 
         while (! Cache::has($cacheKey)) {
 
